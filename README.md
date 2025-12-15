@@ -1,36 +1,210 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 📌 Sistema de Controle de Ponto
 
-## Getting Started
+## 📖 Visão Geral
 
-First, run the development server:
+Este projeto consiste em um **Sistema de Controle de Ponto Eletrônico**, onde o usuário registra sua presença ao realizar login (matrícula ou e-mail + senha). O sistema registra automaticamente **data, hora e minutos**, permitindo posterior **visualização, análise e auditoria** dos registros.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+O sistema foi pensado para ser **escalável, seguro e auditável**, utilizando uma arquitetura moderna baseada em **API REST**.
+
+---
+
+## 🧱 Arquitetura Geral
+
+```
+┌─────────────┐        HTTP/JSON        ┌──────────────┐
+│  Front-End  │  ───────────────────▶ │   Back-End   │
+│  Next.js    │                        │ Node.js API  │
+└─────────────┘                        └──────┬───────┘
+                                              │
+                                              ▼
+                                      ┌────────────────┐
+                                      │ Banco de Dados │
+                                      │ PostgreSQL /   │
+                                      │ MySQL          │
+                                      └────────────────┘
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## 🛠️ Tecnologias Utilizadas
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 🔹 Front-End
 
-## Learn More
+* **Next.js 16** (App Router)
+* **React**
+* **Fetch API / Axios**
 
-To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 🔹 Back-End
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+* **Node.js**
+* **Express.js**
+* **JWT (Autenticação)**
+* **bcrypt** (hash de senha)
+* **multer** (upload de documentos)
 
-## Deploy on Vercel
+### 🔹 Banco de Dados
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+**MySQL**
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 🔹 Infraestrutura
+
+* **npm (node_modules)**
+* **dotenv** (variáveis de ambiente)
+* **Nodemon** (ambiente de desenvolvimento)
+
+---
+
+## 📂 Estrutura de Pastas (Back-End)
+
+```
+Back-End/
+│
+├── src/
+│   ├── config/          # Configurações globais (DB, env)
+│   ├── controllers/     # Lógica das requisições
+│   ├── middlewares/     # Autenticação, validações
+│   ├── models/          # Modelos do banco de dados
+│   ├── routes/          # Centralização das rotas
+│   ├── services/        # Regras de negócio
+│   └── uploads/         # Arquivos enviados
+│
+├── app.js               # Configuração do Express
+├── server.js            # Inicialização do servidor
+├── package.json
+└── .env
+```
+
+---
+
+## 🔐 Autenticação
+
+* Login via **matrícula ou e-mail + senha**
+* Senhas armazenadas com **bcrypt**
+* Sessões autenticadas via **JWT**
+
+Fluxo:
+
+1. Usuário faz login
+2. API valida credenciais
+3. Token JWT é retornado
+4. Token é usado para registrar presença
+
+---
+
+## ⏱️ Registro de Ponto (Presença)
+
+### 📌 O que é registrado
+
+* **ID do usuário**
+* **Data** (YYYY-MM-DD)
+* **Hora** (HH:MM:SS)
+* **Minutos totais**
+* **Tipo do registro** (entrada / saída)
+
+### 📄 Exemplo de estrutura no banco
+
+```sql
+CREATE TABLE registros_ponto (
+  id SERIAL PRIMARY KEY,
+  usuario_id INT NOT NULL,
+  data DATE NOT NULL,
+  hora TIME NOT NULL,
+  minutos INT NOT NULL,
+  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+---
+
+## 🔁 Fluxo do Registro de Presença
+
+1. Usuário clica no botão **"Presença"**
+2. Front-end envia requisição autenticada
+3. Back-end:
+
+   * Captura data e hora do servidor
+   * Valida usuário
+   * Salva no banco
+4. Retorna confirmação ao usuário
+
+---
+
+## 📡 Endpoint Exemplo
+
+```http
+POST /api/ponto/registrar
+Authorization: Bearer <token>
+```
+
+Resposta:
+
+```json
+{
+  "message": "Ponto registrado com sucesso",
+  "data": "2025-06-21",
+  "hora": "09:03:12"
+}
+```
+
+---
+
+## 📎 Upload de Documentos
+
+* Utilizado para anexar justificativas (atestado, declaração, etc.)
+* Implementado com **multer**
+
+Tipos permitidos:
+
+* PDF
+* JPG / PNG
+
+Arquivos são associados ao registro de ponto.
+
+---
+
+## 📊 Visualização e Análise
+
+Funcionalidades previstas:
+
+* Listagem por usuário
+* Filtro por período
+* Exportação (CSV / PDF)
+* Cálculo de carga horária
+
+---
+
+## 🔒 Segurança
+
+* Registro de ponto baseado no **horário do servidor**
+* Rotas protegidas por autenticação
+* Validação de dados no backend
+* Controle de upload
+
+---
+
+## 📌 Boas Práticas Aplicadas
+
+* Separação de responsabilidades
+* Centralização de rotas
+* Banco relacional para auditoria
+* Horário controlado no servidor
+* Escalabilidade para relatórios futuros
+
+---
+
+## 🚀 Próximos Passos
+
+* Dashboard administrativo
+* Relatórios automatizados
+* Integração com BI
+* Logs de auditoria
+
+---
+
+## 📚 Referências
+
+* Documentação oficial do Next.js
+* Express.js Best Practices
+* OWASP API Security
+* PostgreSQL Documentation
