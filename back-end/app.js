@@ -4,9 +4,6 @@ const createError = require('http-errors');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 
-const indexRouter = require('./src/modules/routes/index.js');
-const usersRouter = require('./src/modules/routes/users.route.js');
-const pontoRouter = require('./src/modules/routes/ponto.route.js');
 
 //my app express
 const app = express();
@@ -17,13 +14,17 @@ app.set('view engine', 'pug');
 
 // Config
 app.use(logger('dev'));
-app.use(express.json());
+app.use(express.json()); // Para ler o body JSON
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 
 // routes
+const indexRouter = require('./src/modules/routes/index.js');
+const usersRouter = require('./src/modules/routes/users.route.js');
+const pontoRouter = require('./src/modules/routes/ponto.route.js');
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/ponto', pontoRouter);
