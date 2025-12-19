@@ -19,8 +19,8 @@ O sistema foi pensado para ser **escalável, seguro e auditável**, utilizando u
                                               ▼
                                       ┌────────────────┐
                                       │ Banco de Dados │
-                                      │ PostgreSQL /   │
-                                      │ MySQL          │
+                                      │                |
+                                      │ MySQL / json   │
                                       └────────────────┘
 ```
 
